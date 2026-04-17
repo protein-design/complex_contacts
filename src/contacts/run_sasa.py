@@ -31,26 +31,26 @@ class RunSasa:
         # calcualte SASA separately
         unbounded = []
         delta_total_sasa = 0
-        for f1 in unbounded_pdb_files:
-            u = CalcSasa(f1, self.prob_radious)
+        for unbounded_pdb_file in unbounded_pdb_files:
+            u = CalcSasa(unbounded_pdb_file, self.prob_radious)
             unbounded_saa = u.freesasa()
-            df1 = u.collect_freesasa_result(unbounded_saa)
-            if df1 is None:
+            unbounded_df = u.collect_freesasa_result(unbounded_saa)
+            if unbounded_df is None:
                 if self.verbose:
-                    print(f"Warning: unbounded-SASA of {f1} failed.")
+                    print(f"Warning: unbounded-SASA of {unbounded_pdb_file} failed.")
                 return {}
             else:
                 # calculate delta SASA
-                delta1 = CalcSasa.delta_sasa(df1, df)
-                if delta1 is not None:
-                    total1 = sum(delta1['value'])
-                    delta_total_sasa += total1
+                delta = CalcSasa.delta_sasa(df, unbounded_df)
+                if delta is not None:
+                    total = sum(delta['value'])
+                    delta_total_sasa += total
                     unbounded.append({
-                        'pdb_file': f1,
-                        'chain_ids': list(delta1['chain_id'].unique()),
-                        'delta_total_sasa': total1,
-                        'sasa': df1,
-                        'delta': delta1,
+                        'pdb_file': unbounded_pdb_file,
+                        'chain_ids': list(delta['chain_id'].unique()),
+                        'delta_total_sasa': total,
+                        'sasa': unbounded_df,
+                        'delta': delta,
                     })
 
         # export data when only binding are detected

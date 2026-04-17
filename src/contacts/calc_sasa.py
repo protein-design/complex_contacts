@@ -86,7 +86,7 @@ class CalcSasa:
         return None
 
     @staticmethod
-    def delta_sasa(unbounded_df:pd.DataFrame, bounded_df:pd.DataFrame):
+    def delta_sasa(bounded_df:pd.DataFrame, unbounded_df:pd.DataFrame):
         '''
         calculate delta SASA
         '''
@@ -106,16 +106,18 @@ class CalcSasa:
         return None
 
     @staticmethod
-    def parse_seq(df, cutoff:float=None, max_span:int=None):
+    def parse_seq(delta_df:pd.DataFrame, cutoff:float=None, max_span:int=None):
         '''
         detect continuous segments given cutoff and <max_span
         '''
-        if not isinstance(df, pd.DataFrame):
+        if not isinstance(delta_df, pd.DataFrame):
             return None
+        if cutoff is None:
+            cutoff = 5
         if max_span is None:
             max_span = 10
         # values less than 5 in default
-        sig = df[df['value'] >= cutoff]
+        sig = delta_df[delta_df['value'] >= cutoff]
 
         # group significant point
         group = AnalyzeComplex.group_significant_points(sig, max_span)
@@ -124,7 +126,7 @@ class CalcSasa:
         motif = []
         for g in group:
             start, end = g[0][0], g[-1][0]
-            sub = df.loc[start:end,:]
+            sub = delta_df.loc[start:end,:]
             rec = {
                 'seq': ''.join(sub['aa']),
                 'sig_res': len(g),

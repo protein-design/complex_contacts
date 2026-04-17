@@ -34,6 +34,7 @@ class TestRunSasa(TestCase):
         pool = [(pdb_file, unbounded_pdb_files),]
         pfile = os.path.join(RESULTS_DIR, f'{bounded_pdb_id}.pkl')
         res = RunSasa().run(pool, pfile)
+        assert os.path.exists(pfile) == True
         assert len(res) == 1
         assert res[0].get('delta_total_sasa') == expect_delta
         assert res[0].get('unbounded')[0].get('motif') == expect_motif
